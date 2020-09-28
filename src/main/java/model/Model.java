@@ -89,7 +89,7 @@ public class Model {
     //содержит ли клетка букву
     public boolean hasChar(int x, int y){
         if (x >= 5 || y >= 5 || x < 0 || y < 0) return false;
-        return field[x][y] != '\u0000';
+        return field[x][y] != emptyChar;
     }
 
     //установка буквы
