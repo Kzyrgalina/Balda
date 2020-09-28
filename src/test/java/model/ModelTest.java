@@ -40,10 +40,10 @@ class ModelTest {
         assertTrue(model.setSelectedCell(new Point(1,1)));
         model.setChar('w');
         assertTrue(model.isCharWasSet()); //буква установлена
-        assertTrue(model.selectPath(new Point(2, 2)));
-        assertTrue(model.selectPath(new Point(1, 2)));
+        assertEquals(0, model.selectPath(new Point(2, 2)));
+        assertEquals(0, model.selectPath(new Point(1, 2)));
         assertFalse(model.isSelectedCharInPath()); //путь не содержит новую букву
-        assertTrue(model.selectPath(new Point(1, 1)));
+        assertEquals(0, model.selectPath(new Point(1, 1)));
         assertTrue(model.isSelectedCharInPath()); //слово содержит новую букву
 
         assertEquals(expected, model.getPath());
@@ -85,21 +85,46 @@ class ModelTest {
     void lose(){
         model.start();
 
-        //первый игрок три раза подряд пропускает ход
+        //игроки просто так пропускают ход
         assertTrue(model.addWord("---"));
         assertTrue(model.addWord("1"));
         assertTrue(model.addWord("---"));
         assertTrue(model.addWord("2"));
+
+        //игроки 2 раза подряд пропускают ход
+        assertTrue(model.addWord("---"));
+        assertTrue(model.addWord("---"));
+        assertTrue(model.addWord("---"));
         assertTrue(model.addWord("---"));
 
         //пропуски содержатся в списке слов
         assertTrue(model.getWords(true).containsKey("0---"));
         assertTrue(model.getWords(true).containsKey("1---"));
         assertTrue(model.getWords(true).containsKey("2---"));
+        assertTrue(model.getWords(false).containsKey("0---"));
+        assertTrue(model.getWords(false).containsKey("1---"));
 
-        //игра окончена, победил второй игрок
+
+        //игра окончена, ничья
         assertTrue(model.isGameOver());
-        assertEquals(GameState.SECOND, model.getWinner());
+        assertEquals(GameState.DRAW, model.getWinner());
 
+    }
+
+    @Test
+    void win(){
+        model.start();
+        model.addWord("123"); // для первого игрока
+        model.addWord("1234"); // для второго игрока
+
+        for (int i = 10; i < 28; i++) {
+            model.addWord(i + "");
+        }
+
+        //игра окончена, победил второй
+        assertTrue(model.isGameOver());
+        assertEquals(21, model.getScore(true));
+        assertEquals(22, model.getScore(false));
+        assertEquals(GameState.SECOND, model.getWinner());
     }
 }

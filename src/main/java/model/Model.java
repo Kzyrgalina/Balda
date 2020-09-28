@@ -110,22 +110,22 @@ public class Model {
     }
 
     //сбор пути по клеткам
-    public boolean selectPath(Point point){
+    public int selectPath(Point point){
         if (path.isEmpty()) {
             path.add(point);
-            return true;
+            return 0;
         } else {
             Point lastPoint= path.get(path.size() - 1);
             if (isNeighbours(point, lastPoint) && !path.contains(point)){
                 path.add(point);
-                return true;
+                return 0;
             }
             if (point.x == lastPoint.x && point.y == lastPoint.y){
                 path.remove(point);
-                return false;
+                return 1;
             }
         }
-        return false;
+        return 2;
     }
 
     //содержит ли путь новую букву
@@ -152,10 +152,16 @@ public class Model {
         if (playerTrue.notContainWord(word) && playerFalse.notContainWord(word)){
             if (currentPlayer){
                 playerTrue.addWord(word);
-                if (!word.equals("---")) playerTrue.setLoseCount(0);
+                if (!word.equals("---")) {
+                    playerTrue.setLoseCount(0);
+                    playerFalse.setLoseCount(0);
+                }
             } else {
                 playerFalse.addWord(word);
-                if (!word.equals("---")) playerFalse.setLoseCount(0);
+                if (!word.equals("---")) {
+                    playerTrue.setLoseCount(0);
+                    playerFalse.setLoseCount(0);
+                }
             }
             currentPlayer = !currentPlayer;
             if (!word.equalsIgnoreCase("---"))howManyLetters++;
@@ -183,12 +189,13 @@ public class Model {
     }
 
     public boolean isGameOver(){
-        return (playerTrue.getLoseCount() > 2 || playerFalse.getLoseCount() > 2 || howManyLetters > 19);
+        return (playerTrue.getLoseCount() > 1 && playerFalse.getLoseCount() > 1 || howManyLetters > 19);
     }
 
     public GameState getWinner(){
         if (isGameOver()){
-            if (playerTrue.getFullScore() == playerFalse.getFullScore()) return GameState.DRAW;
+            if ((playerTrue.getLoseCount() == 2 && playerFalse.getLoseCount() == 2) ||
+                (playerTrue.getFullScore() == playerFalse.getFullScore())) return GameState.DRAW;
             if (playerTrue.getFullScore() > playerFalse.getFullScore()) return GameState.FIRST;
             else return GameState.SECOND;
         } else return GameState.PLAY;

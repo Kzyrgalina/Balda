@@ -40,7 +40,7 @@ public class Controller {
                 //отмена выбранной кнопки в пути
                 state = cell.getState();
                 if (model.isCharWasSet() && (state == APPLY_TO_PATH || state == PATH)){
-                    if (!model.selectPath(cell.getLocate())){
+                    if (model.selectPath(cell.getLocate()) == 1){
                         if (state == APPLY_TO_PATH){
                             cell.setState(PRE_APPLY);
                         } else {
@@ -50,7 +50,7 @@ public class Controller {
                 } else{
                     //выбор кнопки в путь слова
                     if (model.isCharWasSet() && (state == BUSY || state == PRE_APPLY)) {
-                        if (model.selectPath(cell.getLocate())){
+                        if (model.selectPath(cell.getLocate()) == 0){
                             if (state == PRE_APPLY){
                                 cell.setState(APPLY_TO_PATH);
                             } else {
@@ -98,7 +98,8 @@ public class Controller {
 
                 view.showMessage("");
                 view.addNewWord(player, word, model.getPlayerSize(player));
-                view.setScore(player, model.getScore(player), model.getLoseCount(player));
+                view.setScore(true, model.getScore(true), model.getLoseCount(true));
+                view.setScore(false, model.getScore(false), model.getLoseCount(false));
                 view.setPlayer(player);
 
                 for (Point point :
